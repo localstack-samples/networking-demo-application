@@ -4,6 +4,7 @@ mkShell {
   packages = [
     docker
     python311Packages.venvShellHook
+    awscli2
   ];
   venvDir = ".venv";
 
