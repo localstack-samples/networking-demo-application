@@ -20,7 +20,7 @@ services:
       retries: 10
 
   deploy:
-    image: localstack/localstack
+    image: node:18-slim
     depends_on:
       localstack:
         condition: service_healthy
@@ -29,31 +29,37 @@ services:
       - AWS_ACCESS_KEY_ID=test
       - AWS_SECRET_ACCESS_KEY=test
       - AWS_REGION=us-east-1
+      - AWS_ACCOUNT_ID=000000000000
+      - AWS_ENDPOINT_URL=http://localhost.localstack.cloud:4566
+    working_dir: /cdk
     command: >
-      bash -xc "aws --region us-east-1 --endpoint-url http://localhost.localstack.cloud:4566 cloudformation create-stack --stack-name network-demo --template-body file:///host/cloudformation.yml &&
-      aws --region us-east-1 --endpoint-url http://localhost.localstack.cloud:4566 cloudformation wait stack-create-complete --stack-name network-demo"
+      bash -xc "
+      npm install &&
+      npx cdklocal bootstrap &&
+      npx cdklocal deploy --require-approval never
+      "
     volumes:
-      - $PWD:/host
+      - $PWD/cdk:/cdk
     networks:
       - ls
     dns:
       - 10.0.2.20
 
-  application:
-    depends_on:
-      deploy:
-        condition: service_completed_successfully
-    build: .
-    ports:
-      - "5000:5000"
-    environment:
-      - AWS_ACCESS_KEY_ID=test
-      - AWS_SECRET_ACCESS_KEY=test
-      - AWS_REGION=us-east-1
-    networks:
-      - ls
-    dns:
-      - 10.0.2.20
+  # application:
+  #   depends_on:
+  #     deploy:
+  #       condition: service_completed_successfully
+  #   build: .
+  #   ports:
+  #     - "5000:5000"
+  #   environment:
+  #     - AWS_ACCESS_KEY_ID=test
+  #     - AWS_SECRET_ACCESS_KEY=test
+  #     - AWS_REGION=us-east-1
+  #   networks:
+  #     - ls
+  #   dns:
+  #     - 10.0.2.20
 
 networks:
   ls:
