@@ -18,17 +18,20 @@ Resources:
   BucketNameParameter:
     Type: AWS::SSM::Parameter
     Properties:
+      Name: "/network-demo/bucket"
       Type: String
       Value: !Ref Bucket
 
   QueueUrlParameter:
     Type: AWS::SSM::Parameter
     Properties:
+      Name: "/network-demo/queue"
       Type: String
       Value: !Ref Queue
 
   TableNameParameter:
     Type: AWS::SSM::Parameter
     Properties:
+      Name: "/network-demo/table"
       Type: String
       Value: !Ref Table
