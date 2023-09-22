@@ -40,26 +40,27 @@ services:
       "
     volumes:
       - $PWD/cdk:/cdk
+      - "/var/run/docker.sock:/var/run/docker.sock"
     networks:
       - ls
     dns:
       - 10.0.2.20
 
-  # application:
-  #   depends_on:
-  #     deploy:
-  #       condition: service_completed_successfully
-  #   build: .
-  #   ports:
-  #     - "5000:5000"
-  #   environment:
-  #     - AWS_ACCESS_KEY_ID=test
-  #     - AWS_SECRET_ACCESS_KEY=test
-  #     - AWS_REGION=us-east-1
-  #   networks:
-  #     - ls
-  #   dns:
-  #     - 10.0.2.20
+  application:
+    depends_on:
+      deploy:
+        condition: service_completed_successfully
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - AWS_REGION=us-east-1
+    networks:
+      - ls
+    dns:
+      - 10.0.2.20
 
 networks:
   ls:
