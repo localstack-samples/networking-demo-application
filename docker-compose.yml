@@ -1,0 +1,62 @@
+version: "3.8"
+
+services:
+  localstack:
+    container_name: "${LOCALSTACK_DOCKER_NAME-localstack-main}"
+    image: localstack/localstack
+    environment:
+      - DEBUG=${DEBUG-}
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    networks:
+      ls:
+        ipv4_address: 10.0.2.20
+    # shorten healthcheck duration for better dev experience
+    healthcheck:
+      test: ["CMD", "./bin/localstack", "status", "services", "--format=json"]
+      interval: 1s
+      timeout: 1s
+      retries: 10
+
+  deploy:
+    image: localstack/localstack
+    depends_on:
+      localstack:
+        condition: service_healthy
+    entrypoint: ""
+    environment:
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - AWS_REGION=us-east-1
+    command: >
+      bash -xc "aws --region us-east-1 --endpoint-url http://localhost.localstack.cloud:4566 cloudformation create-stack --stack-name network-demo --template-body file:///host/cloudformation.yml &&
+      aws --region us-east-1 --endpoint-url http://localhost.localstack.cloud:4566 cloudformation wait stack-create-complete --stack-name network-demo"
+    volumes:
+      - $PWD:/host
+    networks:
+      - ls
+    dns:
+      - 10.0.2.20
+
+  application:
+    depends_on:
+      deploy:
+        condition: service_completed_successfully
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - AWS_REGION=us-east-1
+    networks:
+      - ls
+    dns:
+      - 10.0.2.20
+
+networks:
+  ls:
+    ipam:
+      config:
+        - subnet: 10.0.2.0/24

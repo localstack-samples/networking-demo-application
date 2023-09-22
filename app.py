@@ -12,7 +12,9 @@ app.secret_key = "secret-key"
 
 @lru_cache
 def client_factory(service: str):
-    return boto3.client(service, endpoint_url="http://localhost.localstack.cloud:4566")
+    return boto3.client(
+        service, endpoint_url="http://localhost.localstack.cloud:4566", region_name="us-east-1"
+    )
 
 
 ssm_client = client_factory("ssm")
