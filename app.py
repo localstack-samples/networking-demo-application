@@ -4,6 +4,7 @@ import json
 
 from flask import Flask, request, render_template, redirect, flash, url_for
 import boto3
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 app.secret_key = "secret-key"
@@ -17,6 +18,7 @@ def client_factory(service: str):
 ssm_client = client_factory("ssm")
 s3_client = client_factory("s3")
 sqs_client = client_factory("sqs")
+dynamo_client = client_factory("dynamodb")
 
 # Set up constants
 raw_ssm_parameters = ssm_client.get_parameters_by_path(Path="/network-demo", Recursive=True)[
@@ -37,14 +39,34 @@ def handle_upload():
     if not file:
         error = "No file specified"
     else:
-        # TODO: secure filename
+        filename = secure_filename(file.filename)
         file_id = str(uuid.uuid4())
         s3_key = f"raw/{file_id}"
         s3_client.upload_fileobj(file, ssm_parameters["/network-demo/bucket"], s3_key)
 
         # enqueue message
-        sqs_client.send_message(QueueUrl=ssm_parameters["/network-demo/queue"], MessageBody=json.dumps({}))
+        sqs_client.send_message(
+            QueueUrl=ssm_parameters["/network-demo/queue"],
+            MessageBody=json.dumps(
+                {
+                    "id": file_id,
+                    "bucket": ssm_parameters["/network-demo/bucket"],
+                    "filename": filename,
+                }
+            ),
+        )
 
         flash("File uploaded!")
         return redirect(url_for("index"))
     return render_template(url_for("index"), error=error)
+
+
+@app.route("/results")
+def results():
+    pages = dynamo_client.get_paginator("scan").paginate(
+        TableName=ssm_parameters["/network-demo/table"]
+    )
+    file_sizes = []
+    for page in pages:
+        file_sizes.extend(page["Items"])
+    return render_template("results.html", file_sizes=file_sizes)
