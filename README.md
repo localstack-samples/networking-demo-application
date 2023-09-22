@@ -19,6 +19,7 @@ The web application allows for past uploads to be viewed, and their sizes analys
 To recreate this example application, run the following commands:
 
 ```
-TBD
+docker compose up
+# visit http://localhost:5000
 ```
 
