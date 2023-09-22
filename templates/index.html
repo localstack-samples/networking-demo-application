@@ -1,5 +1,31 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Hello world</h1>
+	<div class="mx-auto container">
+		<h1 class="text-center text-6xl font-semibold leading-normal mt-0 mb-2">File Size Calculator</h1>
+
+		{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
+
+		{% if error %}
+		{% endif %}
+
+		<p>
+		Upload your file and we will tell you its size!
+		</p>
+
+		<form class="p-4" method="POST" action="/upload" enctype="multipart/form-data">
+			<input class="p-4" type="file" name="file">
+			<br />
+			<input class="font-bold uppercase px-8 py-3 rounded shadow-md hover:text-gray-500 cursor-pointer" type="submit" value="Upload!">
+		</form>
+	</div>
 {% endblock content %}
