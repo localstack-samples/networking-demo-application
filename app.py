@@ -43,8 +43,9 @@ def handle_upload():
     else:
         filename = secure_filename(file.filename)
         file_id = str(uuid.uuid4())
-        s3_key = f"raw/{file_id}"
-        s3_client.upload_fileobj(file, ssm_parameters["/network-demo/bucket"], s3_key)
+        s3_key = file_id
+        bucket_name = ssm_parameters["/network-demo/bucket"]
+        s3_client.upload_fileobj(file, bucket_name, s3_key)
 
         # enqueue message
         sqs_client.send_message(
@@ -52,7 +53,7 @@ def handle_upload():
             MessageBody=json.dumps(
                 {
                     "id": file_id,
-                    "bucket": ssm_parameters["/network-demo/bucket"],
+                    "bucket": bucket_name,
                     "filename": filename,
                 }
             ),
@@ -72,3 +73,8 @@ def results():
     for page in pages:
         file_sizes.extend(page["Items"])
     return render_template("results.html", file_sizes=file_sizes)
+
+
+@app.route("/health")
+def health():
+    return "ok"

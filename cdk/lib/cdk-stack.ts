@@ -11,7 +11,7 @@ export class CdkStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    const bucket = new s3.Bucket(this, "Bucket")
+    const bucket = new s3.Bucket(this, "Bucket");
     const queue = new sqs.Queue(this, "Queue")
     const table = new dynamodb.Table(this, "Table", {
       partitionKey: {
@@ -28,6 +28,8 @@ export class CdkStack extends cdk.Stack {
     });
     const eventSource = new lambdaEventSources.SqsEventSource(queue);
     handler.addEventSource(eventSource);
+
+    bucket.grantReadWrite(handler);
 
 
     // ssm parameters

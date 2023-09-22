@@ -1,11 +1,16 @@
 {% extends "base.html" %}
 
 {% block content %}
+	<h1 class="text-center text-6xl font-semibold leading-normal mt-0 mb-2">Results</h1>
+	{% if file_sizes %}
 	<ul>
-{% for entry in file_sizes %}
-	<li>
-	File {{ entry["filename"]["S"] }} (id: {{ entry["pk"]["S"] }}) has size {{ entry["size"]["N"] }} bytes
-	</li>
-{% endfor %}
+		{% for entry in file_sizes %}
+			<li>
+				File {{ entry["filename"]["S"] }} (id: {{ entry["pk"]["S"] }}) has size {{ entry["size"]["N"] }} bytes
+			</li>
+		{% endfor %}
 	</ul>
+{% else %}
+	<p>No files uploaded</p>
+{% endif %}
 {% endblock content %}

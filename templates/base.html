@@ -1,13 +1,21 @@
 <!doctype html>
 <html>
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body>
-	{% block content %}
-	{% endblock content %}
-</body>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<script src="https://cdn.tailwindcss.com"></script>
+	</head>
+	<body>
+		<div class="mx-auto container">
+			<nav class="p-4 pt-8">
+				{% block nav %}
+					<a class="" href="{{ url_for('index') }}">Home</a>
+					<a class="" href="{{ url_for('results') }}">Results</a>
+				{% endblock nav %}
+			</nav>
+			{% block content %}
+			{% endblock content %}
+		</div>
+	</body>
 </html>
 
