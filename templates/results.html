@@ -1,7 +1,11 @@
 {% extends "base.html" %}
 
 {% block content %}
+	<ul>
 {% for entry in file_sizes %}
-	{{ entry }}
+	<li>
+	File {{ entry["filename"]["S"] }} (id: {{ entry["pk"]["S"] }}) has size {{ entry["size"]["N"] }} bytes
+	</li>
 {% endfor %}
+	</ul>
 {% endblock content %}
