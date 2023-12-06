@@ -1,0 +1,43 @@
+name: Smoke tests
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_call:
+  push:
+    branches:
+      - main
+
+# Only one pull-request triggered run should be executed at a time
+# (head_ref is only set for PR events, otherwise fallback to run_id which differs for every run).
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  smoke-tests:
+    name: Smoke tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: pull the images
+        run: docker compose pull
+
+      - name: build the custom images
+        run: docker compose build
+
+      - name: Start the stack
+        run: |
+          docker compose up -d --wait --wait-timeout 120
+
+      - name: Put a file
+        run: |
+          curl --fail -v -X POST -F "file=@$PWD/app.py" http://127.0.0.1:5000/upload
+
+      - name: Ensure the file is on the results page after a while
+        run: |
+          sleep 5
+          curl -s http://localhost:5000/results | grep -q app\.py
+
