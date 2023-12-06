@@ -59,7 +59,7 @@ def handle_upload():
             ),
         )
 
-        flash("File uploaded!")
+        flash("File uploaded! Visit the `Results` page to see your file size in a few seconds!")
         return redirect(url_for("index"))
     return render_template(url_for("index"), error=error)
 
