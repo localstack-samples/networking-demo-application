@@ -3,6 +3,7 @@ version: "3.8"
 services:
   localstack:
     image: localstack/localstack
+    init: true
     # ports:
     #   - "127.0.0.1:4566:4566"  # only used during development
     environment:
@@ -54,6 +55,7 @@ services:
       deploy:
         condition: service_completed_successfully
     build: .
+    init: true
     ports:
       - "5000:5000"
     environment:
