@@ -13,7 +13,9 @@ app.secret_key = "secret-key"
 @lru_cache
 def client_factory(service: str):
     return boto3.client(
-        service, endpoint_url="http://localhost.localstack.cloud:4566", region_name="us-east-1"
+        service,
+        endpoint_url="http://localhost.localstack.cloud:4566",
+        region_name="us-east-1",
     )
 
 
@@ -23,9 +25,9 @@ sqs_client = client_factory("sqs")
 dynamo_client = client_factory("dynamodb")
 
 # Set up constants
-raw_ssm_parameters = ssm_client.get_parameters_by_path(Path="/network-demo", Recursive=True)[
-    "Parameters"
-]
+raw_ssm_parameters = ssm_client.get_parameters_by_path(
+    Path="/network-demo", Recursive=True
+)["Parameters"]
 ssm_parameters = {every["Name"]: every["Value"] for every in raw_ssm_parameters}
 
 
@@ -59,9 +61,13 @@ def handle_upload():
             ),
         )
 
-        flash("File uploaded! Visit the `Results` page to see your file size in a few seconds!")
+        flash(
+            "File uploaded! Visit the `Results` page to see your file size in a few seconds!"
+        )
         return redirect(url_for("index"))
-    return render_template(url_for("index"), error=error)
+
+    flash(error)
+    return redirect(url_for("index"))
 
 
 @app.route("/results")
