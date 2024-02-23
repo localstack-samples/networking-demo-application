@@ -19,12 +19,13 @@ services:
     # shorten healthcheck duration for better dev experience
     healthcheck:
       test: ["CMD", "./bin/localstack", "status", "services", "--format=json"]
-      interval: 1s
+      interval: 5s
       timeout: 1s
       retries: 10
 
   deploy:
     image: node:18-slim
+    init: true
     depends_on:
       localstack:
         condition: service_healthy
