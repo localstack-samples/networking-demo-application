@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   localstack:
-    image: localstack/localstack
+    image: localstack/localstack@sha256:3c0c3339f14e8d0cc43be84d318f26108179bd50a47e1d240c57493a7ddc86bc
     init: true
     # ports:
     #   - "127.0.0.1:4566:4566"  # only used during development
@@ -24,7 +24,7 @@ services:
       retries: 10
 
   deploy:
-    image: node:18-slim
+    image: node@sha256:7642244621c75012ab49a03156639537fd7ab654a1f772e854115c93edb039df
     init: true
     depends_on:
       localstack:

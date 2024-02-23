@@ -1,4 +1,4 @@
-FROM python:3.11-slim
+FROM python@sha256:ce81dc539f0aedc9114cae640f8352fad83d37461c24a3615b01f081d0c0583a
 
 # install curl for the health check
 RUN apt-get update && \
